@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Event Registrations & Attendance Status</h3>
+
+<!-- Form para sa pagrehistro ng participant sa event (dala ang current filter states para hindi mawala sa filter) -->
+<form method="POST" class="form-inline">
+    <input type="hidden" name="event_filter_state" value="{{ selected_event }}">
+    <input type="hidden" name="status_filter_state" value="{{ selected_status }}">
+    
+    <select name="event_id" required>
+        <option value="">Select Event to Register</option>
+        {% for e in events %}
+        <option value="{{ e.event_id }}">{{ e.title }} (Cap: {{ e.capacity }})</option>
+        {% endfor %}
+    </select>
+    <select name="participant_id" required>
+        <option value="">Select Participant</option>
+        {% for p in participants %}
+        <option value="{{ p.participant_id }}">{{ p.name }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Register for Event</button>
+</form>
+
+<hr style="margin: 20px 0; border: 0; border-top: 1px solid #ddd;">
+
+<!-- Filter Form para sa Event at Status -->
+<form method="GET" action="{{ url_for('manage_registrations') }}" class="form-inline">
+    <select name="event_filter">
+        <option value="">-- All Events --</option>
+        {% for e in events %}
+        <option value="{{ e.event_id }}" {% if selected_event|string == e.event_id|string %}selected{% endif %}>{{ e.title }}</option>
+        {% endfor %}
+    </select>
+
+    <select name="status_filter">
+        <option value="">-- All Status --</option>
+        <option value="Registered" {% if selected_status == 'Registered' %}selected{% endif %}>Registered</option>
+        <option value="Present" {% if selected_status == 'Present' %}selected{% endif %}>Present</option>
+        <option value="Absent" {% if selected_status == 'Absent' %}selected{% endif %}>Absent</option>
+    </select>
+
+    <button type="submit" style="background: #27ae60;">Filter List</button>
+</form>
+
+<!-- Capacity Summary kung may piniling event -->
+{% if event_stats %}
+<div style="background: #e8f4f8; padding: 15px; border-radius: 6px; margin-bottom: 20px; border-left: 5px solid #3498db;">
+    <h4 style="margin: 0 0 8px 0; color: #2c3e50;">📊 Capacity Summary: {{ event_stats.title }}</h4>
+    <p style="margin: 0; font-size: 15px;">
+        <strong>Total Capacity:</strong> {{ event_stats.capacity }} | 
+        <strong>Occupied Slots:</strong> {{ event_stats.occupied }} | 
+        <strong>Remaining Slots:</strong> <span style="color: {% if event_stats.remaining == 0 %}red{% else %}green{% endif %}; font-weight: bold;">{{ event_stats.remaining }}</span>
+    </p>
+</div>
+{% endif %}
+
+<table>
+    <tr>
+        <th>Event</th>
+        <th>Date</th>
+        <th>Venue</th>
+        <th>Participant</th>
+        <th>Status</th>
+        <th>Mark Attendance</th>
+        <th>Action</th>
+    </tr>
+    {% for r in registrations %}
+    <tr>
+        <td>{{ r.event_title }}</td>
+        <td>{{ r.event_date }}</td>
+        <td>{{ r.venue }}</td>
+        <td>{{ r.participant_name }}</td>
+        <td><span class="badge {{ r.attendance_status.lower() }}">{{ r.attendance_status }}</span></td>
+        <td>
+            <!-- Attendance update forms na nagpapadala ng current filter state -->
+            <form action="{{ url_for('update_attendance', registration_id=r.registration_id, status='Present') }}" method="POST" style="display:inline;">
+                <input type="hidden" name="event_filter_state" value="{{ selected_event }}">
+                <input type="hidden" name="status_filter_state" value="{{ selected_status }}">
+                <button type="submit" class="btn-success">Present</button>
+            </form>
+            <form action="{{ url_for('update_attendance', registration_id=r.registration_id, status='Absent') }}" method="POST" style="display:inline;">
+                <input type="hidden" name="event_filter_state" value="{{ selected_event }}">
+                <input type="hidden" name="status_filter_state" value="{{ selected_status }}">
+                <button type="submit" class="btn-warning">Absent</button>
+            </form>
+        </td>
+        <td>
+            <!-- REMOVE BUTTON (Inaalis lang sa event slot, hindi binubura sa main participants) -->
+            <form action="{{ url_for('remove_registration', registration_id=r.registration_id) }}" method="POST" style="display:inline;">
+                <input type="hidden" name="event_filter_state" value="{{ selected_event }}">
+                <input type="hidden" name="status_filter_state" value="{{ selected_status }}">
+                <button type="submit" class="btn-danger" onclick="return confirm('Remove participant from this event?');">Remove</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="7" style="text-align: center; color: #7f8c8d;">No registrations found for this filter.</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

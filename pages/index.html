@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h3>Welcome to the Event Registration and Attendance Portal</h3>
+    <p>Manage events, track participant slots, and monitor attendance efficiently.</p>
+    
+    <div class="stats-grid">
+        <div class="stat-box"><h4>Total Events</h4><p>{{ total_events }}</p></div>
+        <div class="stat-box"><h4>Total Participants</h4><p>{{ total_participants }}</p></div>
+        <div class="stat-box"><h4>Total Registrations</h4><p>{{ total_registrations }}</p></div>
+    </div>
+</div>
+{% endblock %}

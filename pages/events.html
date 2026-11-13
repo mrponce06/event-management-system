@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Manage Events</h3>
+<form method="POST" class="form-inline">
+    <input type="text" name="title" placeholder="Event Title" required>
+    <input type="date" name="event_date" required>
+    <input type="text" name="venue" placeholder="Venue" required>
+    <input type="number" name="capacity" min="0" placeholder="Capacity" required>
+    <button type="submit">Create Event</button>
+</form>
+
+<table>
+    <tr><th>ID</th><th>Title</th><th>Date</th><th>Venue</th><th>Capacity</th><th>Action</th></tr>
+    {% for e in events %}
+    <tr>
+        <td>{{ e.event_id }}</td>
+        <td>{{ e.title }}</td>
+        <td>{{ e.event_date }}</td>
+        <td>{{ e.venue }}</td>
+        <td>{{ e.capacity }}</td>
+        <td>
+            <a href="{{ url_for('edit_event', event_id=e.event_id) }}"><button type="button" class="btn-warning">Edit</button></a>
+            <form action="{{ url_for('delete_event', event_id=e.event_id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn-danger" onclick="return confirm('Delete this event?');">Delete</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

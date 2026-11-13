@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Search Events and Participants</h3>
+<form method="GET" action="{{ url_for('search_system') }}" class="form-inline">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search title, venue, or name..." required>
+    <button type="submit">Search</button>
+</form>
+
+{% if query %}
+    <h4>Search Results for "{{ query }}"</h4>
+    <h5>Events Found:</h5>
+    <ul>
+        {% for e in events %}<li>{{ e.title }} at {{ e.venue }} on {{ e.event_date }}</li>{% else %}<li>No matching events.</li>{% endfor %}
+    </ul>
+    <h5>Participants Found:</h5>
+    <ul>
+        {% for p in participants %}<li>{{ p.name }} (Contact: {{ p.contact }})</li>{% else %}<li>No matching participants.</li>{% endfor %}
+    </ul>
+{% endif %}
+{% endblock %}

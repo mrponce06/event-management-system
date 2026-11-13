@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h3>Edit Participant</h3>
+<form method="POST" class="form-inline">
+    <input type="text" name="name" value="{{ participant.name }}" placeholder="Full Name" required>
+    <input type="text" name="contact" value="{{ participant.contact }}" placeholder="Contact Number / Email" required>
+    <button type="submit">Update Participant</button>
+</form>
+<a href="{{ url_for('manage_participants') }}" style="display:inline-block; margin-top:10px; text-decoration:none; color:#3498db;">&larr; Back to Participants</a>
+{% endblock %}
